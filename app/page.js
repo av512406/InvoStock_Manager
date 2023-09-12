@@ -1,113 +1,422 @@
+"use client"
+import Header from '@/components/Header'
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
+
+// export default function Home() {
+//   const [loading, setLoading] = useState(false)
+//   const [loadingaction, setLoadingaction] = useState(false)
+//   const [dropdown, setDropdown] = useState([])
+//   const [query, setQuery] = useState("")
+//   const dropdownOptions = [
+//     { value: 'productA', label: 'Product A' },
+//     { value: 'productB', label: 'Product B' },
+//     { value: 'productC', label: 'Product C' },
+//     // Add more options as needed
+//   ];
+
+//   const dropdownEdit = async (e) => {
+//     let value = e.target.value
+//     setQuery(value)
+//     if (value.length>3) {
+//       setLoading(true)
+//       setDropdown([])
+//       const response = await fetch('api/search?query=' + query)
+//       let rjson = await response.json()
+//       // console.log("HERE " + rjson.products)
+//       setDropdown(rjson.products)
+//       setLoading(false)
+//     }
+//     else setDropdown([])
+
+//   }
+//   return (
+//     <>
+//       <Header />
+//       <div className="container  mx-auto my-8">
+//         <div className="mt-8">
+//           <div className='text-green-700 text-center'>Alert is here  </div>
+//           <h1 className="text-2xl font-semibold">Search a Product</h1>
+//           <div className="flex items-center mt-4">
+//             <input
+//               type="text"
+//               onChange={dropdownEdit}
+//               className="flex-1 border border-gray-300 px-4 py-2 rounded-l-md"
+//               placeholder="Search by name..."
+//             />
+//             <select className="border rounded p-2">
+//               <option value="">Select an option</option>
+//               {dropdownOptions.map(option => (
+//                 <option key={option.value} value={option.value}>
+//                   {option.label}
+//                 </option>
+//               ))}
+//             </select>
+//           </div>
+//           <div>
+//             {loading && <div className='flex justify-center items-center '>
+//               <svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 40 40" className="loading-svg" > <circle cx="20" cy="20" r="18" stroke="#000" strokeWidth="4" fill="none"></circle> <circle cx="20" cy="20" r="18" stroke="#007bff" strokeWidth="4" fill="none" strokeDasharray="90 60" transform="rotate(45 20 20)" > <animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="1.5s" repeatCount="indefinite" /> </circle>
+//               </svg></div>}
+//             <div className='dropcontainer absolute w-[72vw] border border-1 bg-purple-100 rounded-md'>
+//               {dropdown.map(items => {
+//                 return <div key={items.slug} className='container flex justify-between p-2 my-1 border-b-2 '>
+//                   <span className='slug'>{items.slug}({items.quantity} available for ₹{items.price})</span>
+//                   <div className='mx-5'>
+//                     <button onClick={() => { buttonAction("minus", items.slug, items.quantity) }} disabled={loadingaction} className='substract inline-block px-3 py-1 bg-purple-500 cursor-pointer text-white font-semibold rounded-lg shadow-md disabled:bg-purple-200'>-</button>
+//                     <span className='quantity inline-block w-6 mx-3'>{items.quantity}</span>
+//                     <button onClick={() => { buttonAction("plus", items.slug, items.quantity) }} disabled={loadingaction} className='add inline-block px-3 py-1 bg-purple-500 cursor-pointer text-white font-semibold rounded-lg shadow-md disabled:bg-purple-200'>+</button>
+//                   </div>
+//                 </div>
+//               })}
+
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </>
+//   )
+// }
 
 export default function Home() {
+  const [productForm, setProductForm] = useState({})
+    const [products, setProducts] = useState([])
+    const [allproducts, setAllproducts] = useState([])
+  const [userData, setUserdata] = useState([]);
+  const [filterdata, setFilterdata] = useState([]);
+  const [query, setQuery] = useState('');
+  const [billitems, setBillItems] = useState([]);
+
+  const [editProductId, setEditProductId] = useState(null);
+
+
+  useEffect(() => {
+    const getUserdata = async () => {
+      const response = await fetch('api/products')
+      let rjson = await response.json() ;
+      setProducts(rjson.allProducts)
+      setAllproducts(rjson.allProducts)
+
+    }
+    getUserdata();
+  }, []);
+
+  // const handlesearch = (event) => {
+  //   const getSearch = event.target.value;
+  //   if (getSearch.length > 0) {
+  //     // const searchdata = products.filter((item) => item.slug.toLowerCase().includes(getSearch));
+  //     const searchdata = products.filter((item) => {
+  //       if (typeof item.slug === 'string') {
+  //         return item.slug.toLowerCase().includes(getSearch.toLowerCase());
+  //       }
+  //       return false; // Handle non-string slugs gracefully if needed
+  //     });
+  //     console.log(searchdata) ;
+  //     if(!searchdata) setProducts(allproducts);
+  //     else setProducts(searchdata) ;
+  //     // setUserdata(searchdata);
+  //     // setProducts(searchdata.allProducts)
+  //   } else {
+  //     // setUserdata(filterdata);
+  //     setUserdata([]);
+  //   }
+  //   setQuery(getSearch);
+  // }
+  const handlesearch = (event) => {
+    const getSearch = event.target.value;
+  
+    // Check if the search input is empty
+    if (getSearch.length === 0) {
+      // Reset to all products and clear the query
+      // setProducts(allproducts);
+      setProducts([]);
+      // setUserdata([]);
+      setQuery('');
+    } else {
+      // Perform the search and update products
+      const searchdata = allproducts.filter((item) => {
+        if (typeof item.slug === 'string') {
+          return item.slug.toLowerCase().includes(getSearch.toLowerCase());
+        }
+        return false;
+      });
+  
+      setProducts(searchdata);
+      // setUserdata([]);
+      setQuery(getSearch);
+    }
+  };
+  const additem = (product) => {
+    setBillItems((prevBillItems) => [...prevBillItems, product]);
+  }
+  const handleQuantityChange = (id, newQuantity) => {
+  setProducts((prevProducts) =>
+    prevProducts.map((product) =>
+      product.id === id ? { ...product, quantity: newQuantity } : product
+    )
+  );
+};
+  
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <>
+  <Header/>
+      <div className="container  w-full mx-auto my-8">
+          <div className='mb-3'>Search record Datatable in React Js</div>
+        {/* <div className='col-md-12 mt-3 mb-3'> */}
+          <div className="col-md-6 w-[100%] text-center ">
+            <input type="text" name='name' value={query} className=" flex-1 border border-gray-300 px-4 py-2 rounded-l-md w-[100%]" onChange={(e) => handlesearch(e)} placeholder='Search...' />
+            
+          {/* </div> */}
+        {/* </div> */}
+
+        {/* <h1 className="text-2xl font-semibold mb-4"> Displaying Current Stock</h1> */}
+
+        <div className="">
+        <div className="max-h-64 overflow-y-auto">
+          {/* <table className="w-full table-auto">
+          <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-400 p-2">Product Name</th>
+                <th className="border border-gray-400 p-2">Quantity Available</th>
+                <th className="border border-gray-400 p-2">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.slug} className="hover:bg-gray-50">
+                  <td className="border border-gray-400 p-2" onClick={() => additem(product)}>
+                    {product.slug}
+                  </td>
+                  <td className="border border-gray-400 p-2">{product.quantity}</td>
+                  <td className="border border-gray-400 p-2">₹{product.price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table> */}
+          {query && products.length > 0 && (
+          <div className='border border-gray-300 rounded-lg shadow-lg p-4 float'>
+          <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 border-none">Product</th>
+                    <th className="px-4 py-2 border-none">Quantity</th>
+                    <th className="px-4 py-2 border-none">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((product) => (
+                    <tr key={product.slug} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 border-none">{product.slug}</td>
+                      <td className="border border-gray-400 p-2">
+                            {editProductId === product.id ? (
+                              <input
+                                type="number"
+                                value={product.quantity}
+                                onChange={(e) => handleQuantityChange(product.id, e.target.value)}
+                              />
+                            ) : (
+                              product.quantity
+                            )}
+                      </td>
+                      <td className="px-4 py-2 border-none">₹{product.price}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+              )}
+      </div>
+          {/* <table className="border-collapse border border-gray-400 w-full"> */}
+            {/* <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-400 p-2">Product Name</th>
+                <th className="border border-gray-400 p-2">Quantity</th>
+                <th className="border border-gray-400 p-2">Price</th>
+              </tr>
+            </thead> */}
+            {/* <tbody> */}
+              {/* {products.map(product => (
+                <tr key={product.slug} className="hover:bg-gray-50 ">
+                  
+                  <td className="border border-gray-400 p-2" onClick={() => additem(product)}>
+                  {product.slug}</td>
+                  <td className="border border-gray-400 p-2">{product.quantity}</td>
+                  <td className="border border-gray-400 p-2">₹{product.price}</td>
+                </tr>
+              )
+              )} */}
+              {/* {products.map(product => (
+                <div key={product.slug} className="relative">
+                  
+                  <button className="block w-full text-left border border-gray-400 p-2 hover:bg-gray-50" onClick={() => additem(product)}>
+                    {product.slug}
+                  </button>
+
+                  <div className="absolute hidden mt-2 py-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg">
+                    <div className="px-4 py-2">
+                      <p className="text-gray-700">Quantity: {product.quantity}</p>
+                      <p className="text-gray-700">Price: ₹{product.price}</p>
+                    </div>
+                    </div>
+                    </div>
+                  ))} */}
+              
+                  {/* </tbody>
+                </table> */}
+        </div>
+        </div>
+
+
+        <div className="mt-4">
+        <h1 className="text-2xl font-semibold mb-4"> Bill will be shown here </h1>
+          <table className="border-collapse border border-gray-400 w-full">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-400 p-2">Product Name</th>
+                <th className="border border-gray-400 p-2">Quantity</th>
+                <th className="border border-gray-400 p-2">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {billitems.map(product => (
+                <tr key={product.slug} className="hover:bg-gray-50">
+                  <td className="border border-gray-400 p-2">{product.slug}</td>
+                  {/* <td className="border border-gray-400 p-2">{product.quantity}</td> */}
+                  <td className="border border-gray-400 p-2">
+                    <input
+                        type="number"
+                        value={product.quantity}
+                        onChange={(e) => handleQuantityChange(e, index)}
+                      />
+                  </td>
+                  <td className="border border-gray-400 p-2">₹{product.price}</td>
+                </tr>
+              )
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
+    </>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
   )
 }
+
+// export default function Home() {
+//   const [productForm, setProductForm] = useState({})
+//     const [products, setProducts] = useState([])
+//     const [allproducts, setAllproducts] = useState([])
+//   const [userData, setUserdata] = useState([]);
+//   const [filterdata, setFilterdata] = useState([]);
+//   const [query, setQuery] = useState('');
+
+
+//   useEffect(() => {
+//     const getUserdata = async () => {
+//       // const reqData = await fetch("/api/products");
+//       // const resData = await reqData.json();
+//       // console.log(resData.allproducts);
+//       // // setUserdata(resData);
+//       // setFilterdata(resData.allproducts);
+//       const response = await fetch('api/products')
+//       let rjson = await response.json() ;
+//       setProducts(rjson.allProducts)
+//       setAllproducts(rjson.allProducts)
+
+//     }
+//     getUserdata();
+//   }, []);
+
+//   // const handlesearch = (event) => {
+//   //   const getSearch = event.target.value;
+//   //   if (getSearch.length > 0) {
+//   //     // const searchdata = products.filter((item) => item.slug.toLowerCase().includes(getSearch));
+//   //     const searchdata = products.filter((item) => {
+//   //       if (typeof item.slug === 'string') {
+//   //         return item.slug.toLowerCase().includes(getSearch.toLowerCase());
+//   //       }
+//   //       return false; // Handle non-string slugs gracefully if needed
+//   //     });
+//   //     console.log(searchdata) ;
+//   //     if(!searchdata) setProducts(allproducts);
+//   //     else setProducts(searchdata) ;
+//   //     // setUserdata(searchdata);
+//   //     // setProducts(searchdata.allProducts)
+//   //   } else {
+//   //     // setUserdata(filterdata);
+//   //     setUserdata([]);
+//   //   }
+//   //   setQuery(getSearch);
+//   // }
+//   const handlesearch = (event) => {
+//     const getSearch = event.target.value;
+  
+//     // Check if the search input is empty
+//     if (getSearch.length === 0) {
+//       // Reset to all products and clear the query
+//       setProducts(allproducts);
+//       // setUserdata([]);
+//       setQuery('');
+//     } else {
+//       // Perform the search and update products
+//       const searchdata = allproducts.filter((item) => {
+//         if (typeof item.slug === 'string') {
+//           return item.slug.toLowerCase().includes(getSearch.toLowerCase());
+//         }
+//         return false;
+//       });
+  
+//       setProducts(searchdata);
+//       // setUserdata([]);
+//       setQuery(getSearch);
+//     }
+//   };
+  
+
+//   return (
+//     <>
+//   <Header/>
+//       <div className="container  mx-auto my-8">
+//         <div className='col-md-12 mt-3 mb-3'>
+//           <h3 className='mb-3'>Search record Datatable in React Js</h3>
+//           <div className="col-md-6">
+//             <input type="text" name='name' value={query} className="flex-1 border border-gray-300 px-4 py-2 rounded-l-md" onChange={(e) => handlesearch(e)} placeholder='Search...' />
+//             {/* <input
+//               type="text"
+//               name = "name"
+//               value = {query}
+//               onChange={(e) => handlesearch(e)}
+//               className="flex-1 border border-gray-300 px-4 py-2 rounded-l-md"
+//               placeholder="Search by name..."
+//             /> */}
+//           </div>
+//         </div>
+
+//         <h1 className="text-2xl font-semibold mb-4"> Displaying Current Stock</h1>
+
+//         <div className="mt-4">
+//           <table className="border-collapse border border-gray-400 w-full">
+//             <thead>
+//               <tr className="bg-gray-100">
+//                 <th className="border border-gray-400 p-2">Product Name</th>
+//                 <th className="border border-gray-400 p-2">Quantity</th>
+//                 <th className="border border-gray-400 p-2">Price</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {products.map(product => (
+//                 <tr key={product.slug} className="hover:bg-gray-50">
+//                   <td className="border border-gray-400 p-2">{product.slug}</td>
+//                   <td className="border border-gray-400 p-2">{product.quantity}</td>
+//                   <td className="border border-gray-400 p-2">₹{product.price}</td>
+//                 </tr>
+//               )
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
+//     </>
+
+//   )
+// }
