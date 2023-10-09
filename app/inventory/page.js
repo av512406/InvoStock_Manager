@@ -1,17 +1,13 @@
 "use client"
 import Header from "@/components/Header";
 import { useState, useEffect } from 'react'
+import '@/app/page.css';
 
 export default function Home() {
 
     const [productForm, setProductForm] = useState({})
     const [products, setProducts] = useState([])
-    // const stockData = [
-    //     { id: 1, productName: 'Product A', quantity: 10 },
-    //     { id: 2, productName: 'Product B', quantity: 15 },
-    //     { id: 3, productName: 'Product C', quantity: 20 },
-    //     // Add more stock items as needed
-    // ];
+
     useEffect(() => {
         const fetchProducts = async () => {
             const response = await fetch('api/products')
@@ -22,12 +18,10 @@ export default function Home() {
     }, [])
 
     const addProduct = async (e) => {
-        // Fetch all the products again to sync
-        
         e.preventDefault();
         if (!productForm.slug || !productForm.quantity || !productForm.price) {
           console.log('Please fill out all form fields.');
-          return; // Exit the function if form fields are not filled
+          return; 
         }
     
         try {
@@ -62,8 +56,9 @@ export default function Home() {
 
     return (
         <>
-            <Header />
-            <div className="container mt-8 mx-auto">
+            <div className="container  w-100% mx-auto my-8 z-0">
+            <Header/>
+            <div className="container  w-full mx-auto my-8">
                 <div className="container my-8  mx-auto">
                     <h1 onClick={addProduct} className="text-2xl font-semibold mb-4">Add a product</h1>
                     <div className="mt-4">
@@ -110,7 +105,7 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-
+         </div>
         </>
     )
 }

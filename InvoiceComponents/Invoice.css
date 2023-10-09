@@ -1,0 +1,103 @@
+/* Define styles for print media */
+.line {
+    /* border: none; Remove the default border */
+    height: 1.5px; /* Set the desired height for the hr */
+    background-color: black; 
+  }
+  @media print {
+    .invoice{
+        max-width: 30mm;
+    }
+    table {
+        width: 100%;
+        page-break-inside: auto;
+        border-collapse: collapse; /* Ensure cell borders collapse */
+        border: none;
+    }
+  
+    th, td {
+        border: none;
+      /* border: 1px solid black; Add a solid 1px black border to all table cells */
+      padding: 8px; /* Add padding for better spacing */
+      text-align: left; /* Align text to the left */
+      
+    }
+  
+    th {
+      background-color: #f2f2f2; /* Add background color for table headers */
+      font-weight: bold;
+      background-color: transparent ;
+    }
+  
+    /* Apply styles for the table footer */
+    .invoice-table tfoot td {
+      /* border: 1px solid #ccc; */
+      padding: 8px;
+      text-align: left;
+      font-weight: normal; /* Set font-weight to normal for table footer */
+    }
+  }
+  
+  /* Regular styles for your invoice */
+  .invoice {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    border: 1px solid #ccc;
+    /* border:none ;  */
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .invoice-table {
+    width: 100%;
+    border-collapse: collapse; /* Ensure cell borders collapse */
+    border: none;
+  }
+  
+  .invoice-table th,
+  .invoice-table td {
+    /* border: 1px solid #ccc; */
+    border:none ; 
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .invoice-table th {
+    /* background-color: #f2f2f2; */
+    font-weight: bold;
+  }
+  
+  .invoice-table tfoot td {
+    /* border: 1px solid #ccc; */
+    border: none;
+    padding: 8px;
+    text-align: left;
+    font-weight: bold;
+  }
+  
+  /* Add more styles as needed */
+  .terms-container {
+    text-align: center;
+    font-weight: bold;
+  }
+    
+  
+  .shop-details {
+      display: flex; /* Use flexbox to control child alignment */
+      justify-content: space-between; /* Space between child divs */
+      align-items: center; /* Vertically align child divs */
+      padding-left: 11px;
+      padding-right: 35px;
+      font-weight: bold;
+  }
+  .shop-title{
+    font-weight: bolder;
+    font-size: x-large;
+  }
+  
+  

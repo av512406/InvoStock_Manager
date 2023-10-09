@@ -1,0 +1,11 @@
+/* @media (min-width: 1536px) {
+    .container {
+      max-width: 90%;
+    }
+  } */
+  
+  .container {
+    max-width: 90%;
+    /* background-color: antiquewhite; */
+}
+
